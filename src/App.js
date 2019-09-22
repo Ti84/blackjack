@@ -1,24 +1,24 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
+import { deck } from './data/deck';
+import Card from './Card';
 
 function App() {
+  const [deckList, setDeck] = useState(deck);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      <h1>BlackJack</h1>
+      {/* Nav
+      Playing field
+      Player controls */}
+      {deckList.map(({id, name, value, suite}) => (
+
+       <Card key={id}
+        name={name}
+        suite={suite}
+        value={value}/>
+
+      ))}
     </div>
   );
 }
