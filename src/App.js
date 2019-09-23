@@ -1,33 +1,41 @@
-import React, { useState } from "react";
-import "./App.css";
-import { deck } from "./data/deck";
-import { Field } from "./Field";
-import Controls from "./Controls";
+import React, { useState, useEffect } from 'react';
+import './App.css';
+import { deck } from './data/deck';
+import { Field } from './Field';
+import Controls from './Controls';
 
 function App() {
   const [currentDeckState, setCurrentDeck] = useState(deck);
-  const [dealerHandState, setDealerHand] = useState({cards: [], score: 0});
-  const [playerHandState, setPlayerHand] = useState({cards: [], score: 0});
-  // const [playingState, setPlayingState] = useState(false);
+  const [dealerHandState, setDealerHand] = useState({ cards: [], score: 0 });
+  const [playerHandState, setPlayerHand] = useState({ cards: [], score: 0 });
 
   const drawNewCard = (faceDown = false) => {
-      const drawnCard = grabCard();
-      return { card: drawnCard, faceDown: faceDown };
-  }
+    const drawnCard = grabCard();
+    return { card: drawnCard, faceDown: faceDown };
+  };
 
-  const drawCard = (playerName) => {
-   switch(playerName) {
-    case 'dealer':
-        setDealerHand({cards: [...dealerHandState.cards, drawNewCard()]});
+  const hitMe = playerName => {
+    const newCard = drawNewCard();
+    switch (playerName) {
+      case 'dealer':
+        setDealerHand({
+          ...dealerHandState,
+          cards: [...dealerHandState.cards, newCard],
+          score: dealerHandState.score + newCard.card.value
+        });
         break;
       case 'player':
-        setPlayerHand([...playerHandState, drawNewCard()]);
+        setPlayerHand({
+          ...dealerHandState,
+          cards: [...playerHandState.cards, newCard],
+          score: playerHandState.score + newCard.card.value
+        });
         break;
-        default:
-          console.error('Incorrect player given.');
-          break;
+      default:
+        console.error('Incorrect player given.');
+        break;
     }
-  }
+  };
 
   const grabCard = () => {
     const cardIndex = Math.floor(Math.random() * currentDeckState.length);
@@ -37,34 +45,63 @@ function App() {
     setCurrentDeck(tempDeck);
 
     return drawnCard;
-  }
+  };
 
   const startGame = () => {
-    setDealerHand({cards: [drawNewCard(true), drawNewCard()], score: 0});
-    setPlayerHand({cards: [drawNewCard(), drawNewCard()], score: 0});
-    // setPlayingState(true);
-  }
+    const dealerCards = [drawNewCard(true), drawNewCard()];
+    const dealerCardScore = dealerCards.reduce(
+      (acc, currCard) => acc + currCard.card.value,
+      0
+    );
+    const playerCards = [drawNewCard(true), drawNewCard()];
+    const playerCardScore = playerCards.reduce((acc, currCard) => {
+      return acc + currCard.card.value;
+    }, 0);
+
+    setDealerHand({
+      cards: dealerCards,
+      score: dealerCardScore
+    });
+    setPlayerHand({ cards: playerCards, score: playerCardScore });
+  };
 
   const passTurn = () => {
     console.log('nice');
-  }
+  };
+
+  useEffect(() => {
+    const playerScore = playerHandState.score;
+
+    if (playerScore === 21) {
+      alert('dealer turn');
+    }
+
+    if (playerScore > 21) {
+      alert('bust');
+    }
+  }, [dealerHandState, playerHandState]);
 
   return (
     <div className="app">
       <h1>BlackJack</h1>
-      {/* Nav
-      Playing field
-      Player controls */}
+
       <Field fieldName="Dealer" fieldHand={dealerHandState} />
       <Field fieldName="Player" fieldHand={playerHandState} />
-      <Controls onStart={() => startGame()} onHit={() => drawCard('player')} onStand={() => passTurn()} />
+      <Controls
+        onStart={() => startGame()}
+        onHit={() => hitMe('player')}
+        onStand={() => passTurn()}
+      />
     </div>
   );
 }
 
-// Probably can clean this up by using useEffect correctly.
-// Check on rerender for things to add / remove.
-
 // Add tests
+// Refactor code (custom hooks, cleaner code, etc)
+// Restock when cards are low
+// Ability to Add more decks (1 - 4)
+// Controls based on state of game
+// End game conditions
+// Use effect to calc scores or should we calculate scores somewhere else? (Would want to split score from object useEffect route)
 
 export default App;
