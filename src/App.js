@@ -6,9 +6,9 @@ import Controls from "./Controls";
 
 function App() {
   const [currentDeckState, setCurrentDeck] = useState(deck);
-  const [dealerHandState, setDealerHand] = useState([]);
-  const [playerHandState, setPlayerHand] = useState([]);
-  const [playingState, setPlayingState] = useState(false);
+  const [dealerHandState, setDealerHand] = useState({cards: [], score: 0});
+  const [playerHandState, setPlayerHand] = useState({cards: [], score: 0});
+  // const [playingState, setPlayingState] = useState(false);
 
   const drawNewCard = (faceDown = false) => {
       const drawnCard = grabCard();
@@ -18,7 +18,7 @@ function App() {
   const drawCard = (playerName) => {
    switch(playerName) {
     case 'dealer':
-        setDealerHand([...dealerHandState, drawNewCard()]);
+        setDealerHand({cards: [...dealerHandState.cards, drawNewCard()]});
         break;
       case 'player':
         setPlayerHand([...playerHandState, drawNewCard()]);
@@ -40,9 +40,9 @@ function App() {
   }
 
   const startGame = () => {
-    setDealerHand([drawNewCard(true), drawNewCard()]);
-    setPlayerHand([drawNewCard(), drawNewCard()]);
-    setPlayingState(true);
+    setDealerHand({cards: [drawNewCard(true), drawNewCard()], score: 0});
+    setPlayerHand({cards: [drawNewCard(), drawNewCard()], score: 0});
+    // setPlayingState(true);
   }
 
   const passTurn = () => {
@@ -61,5 +61,10 @@ function App() {
     </div>
   );
 }
+
+// Probably can clean this up by using useEffect correctly.
+// Check on rerender for things to add / remove.
+
+// Add tests
 
 export default App;

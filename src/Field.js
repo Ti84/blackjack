@@ -7,7 +7,7 @@ export const Field = ({ fieldName, fieldHand }) => {
     <section className="field">
       <h2>{fieldName}</h2>
       <div className="field__cards">
-        {fieldHand.map(({card}) => (
+        {fieldHand.cards.map(({card}) => (
             <Card key={card.id} value={card.value} suite={card.suite} name={card.name} />
         ))}
       </div>
